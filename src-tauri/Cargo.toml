@@ -1,0 +1,37 @@
+[package]
+name = "personal-crm"
+version = "1.0.0"
+description = "Local-first personal CRM for macOS"
+edition = "2021"
+
+[lib]
+name = "personal_crm_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = ["tray-icon", "image-png"] }
+tauri-plugin-sql = { version = "2", features = ["sqlite"] }
+tauri-plugin-notification = "2"
+tauri-plugin-dialog = "2"
+tauri-plugin-autostart = "2"
+tauri-plugin-global-shortcut = "2"
+tauri-plugin-window-state = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+chrono = "0.4"
+# Used directly for reminder notifications: the Tauri plugin has no action
+# buttons / click callbacks on desktop, this crate does.
+mac-notification-sys = "0.6"
+objc2 = "0.6"
+objc2-foundation = { version = "0.3", features = ["NSString", "NSDate", "NSArray", "NSURL", "NSError", "NSNotification", "NSPredicate", "NSSet", "block2"] }
+block2 = "0.6"
+objc2-event-kit = { version = "0.3", default-features = false, features = ["std", "EKEventStore", "EKEvent", "EKCalendar", "EKCalendarItem", "EKSource", "EKObject", "EKTypes", "block2"] }
+
+[profile.release]
+opt-level = "s"
+lto = true
+codegen-units = 1
+strip = true
