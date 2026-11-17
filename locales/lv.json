@@ -236,6 +236,55 @@
     "calendar_missing": "Kalendārs “CRM” ir izdzēsts – sinhronizācija izslēgta",
     "sync_failed": "Kalendāra sinhronizācija neizdevās: {error}"
   },
+  "ai": {
+    "summary": "Kopsavilkums",
+    "thinking": "Domā…",
+    "may_be_wrong": "var kļūdīties",
+    "label_local": "Apple Intelligence",
+    "label_cloud": "Apple Intelligence (mākonis)",
+    "answered_english": "atbild angliski",
+    "add_to_notes": "Pievienot piezīmēm",
+    "job_title": "Amats",
+    "paste_button": "Ielīmēt kontaktus",
+    "paste_title": "Ielīmēt kontaktus",
+    "paste_placeholder": "Ielīmē e-pasta parakstu vai jebkuru tekstu ar kontaktpersonām…",
+    "paste_recognise": "Atpazīt",
+    "paste_none": "Tekstā netika atrasta neviena persona.",
+    "paste_create_one": "Izveidot {n} kontaktu",
+    "paste_create_other": "Izveidot {n} kontaktus",
+    "status_ready": "Apple Intelligence ir pieejams šajā Mac",
+    "languages": "Valodas: {list}",
+    "no_latvian": "latviešu valoda netiek atbalstīta – atbildes būs angliski",
+    "show": "Rādīt AI funkcijas",
+    "show_hint": "Kontakta kopsavilkums, nākamā soļa ieteikums un kontaktu ielīmēšana. Darbojas šajā Mac.",
+    "cloud": "Izmantot Apple mākoņa modeli, ja lokālais netiek galā",
+    "cloud_hint": "Tad dati tiek nosūtīti uz Apple Private Cloud Compute serveriem. Nepieciešama Apple izsniegta atļauja (entitlement) un maksas izstrādātāja konts.",
+    "cloud_enabled": "Apple mākoņa modelis ieslēgts",
+    "reason": {
+      "device_not_eligible": "Šis Mac neatbalsta Apple Intelligence",
+      "not_enabled": "Apple Intelligence ir izslēgts Sistēmas iestatījumos",
+      "model_not_ready": "Apple Intelligence modelis vēl lejupielādējas",
+      "unsupported_os": "Nepieciešama jaunāka macOS versija",
+      "system_not_ready": "Mākoņa modelis vēl nav gatavs",
+      "quota_reached": "Mākoņa modeļa limits sasniegts",
+      "unavailable": "Nav pieejams"
+    },
+    "err": {
+      "unavailable": "Apple Intelligence nav pieejams",
+      "too_long": "Teksts ir par garu modelim",
+      "refused": "Modelis atteicās atbildēt",
+      "model_not_ready": "Modelis vēl lejupielādējas – mēģini vēlāk",
+      "unsupported_language": "Šī valoda netiek atbalstīta",
+      "rate_limited": "Pārāk daudz pieprasījumu – mēģini pēc brīža",
+      "bad_output": "Modelis atbildēja nesaprotami – mēģini vēlreiz",
+      "failed": "Apple Intelligence neizdevās atbildēt",
+      "cloud_not_entitled": "Mākoņa modelis šai lietotnei nav atļauts (nepieciešama Apple atļauja)",
+      "cloud_network": "Nav savienojuma ar Apple mākoņa modeli",
+      "cloud_quota": "Mākoņa modeļa limits sasniegts",
+      "cloud_unavailable": "Mākoņa modelis nav pieejams",
+      "cloud_failed": "Mākoņa modelis neatbildēja"
+    }
+  },
   "shortcuts": {
     "title": "Īsinājumtaustiņi",
     "group_general": "Vispārīgi",
@@ -278,7 +327,8 @@
     "reminder_reopened": "Atgādinājums atkal aktīvs",
     "reminder_snoozed": "Atgādinājums atlikts",
     "sample_cleared": "Paraugdati dzēsti",
-    "calendar_synced": "Atjaunināts no Apple Calendar"
+    "calendar_synced": "Atjaunināts no Apple Calendar",
+    "contacts_pasted": "Kontakti ielīmēti"
   },
   "toast": {
     "undone": "Atsaukts: {action}",

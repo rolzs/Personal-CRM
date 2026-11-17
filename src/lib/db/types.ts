@@ -82,6 +82,10 @@ export interface Settings {
   calendar_sync: boolean;
   /** EventKit identifier of the "CRM" calendar. */
   calendar_id: string;
+  /** Show Apple Intelligence features (when the model is available). */
+  ai_enabled: boolean;
+  /** Allow Apple's cloud model when the on-device one can't do the job. */
+  ai_cloud: boolean;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -99,6 +103,8 @@ export const DEFAULT_SETTINGS: Settings = {
   notifications_asked: false,
   calendar_sync: false,
   calendar_id: "",
+  ai_enabled: true,
+  ai_cloud: false,
 };
 
 /** Column lists drive the generic INSERT/UPDATE helpers in store.svelte.ts. */

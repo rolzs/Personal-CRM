@@ -4,9 +4,12 @@
 -->
 <script lang="ts">
   import {
-    createDeal, data, deleteActivity, deleteContact, deleteDeal, effectiveTime, logActivity,
+    createDeal, createReminder, data, deleteActivity, deleteContact, deleteDeal, effectiveTime, logActivity,
     updateActivity, updateContact, updateDeal,
   } from "../db/store.svelte";
+  import { aiCall, aiErrorText, aiReady, aiResultLabel, type AiMeta } from "../ai/ai.svelte";
+  import { contactContext, nextStepTime, todayLabel } from "../ai/prepare";
+  import { fmtDate } from "../i18n/index.svelte";
   import { ACTIVITY_TYPES, STAGES, STATUSES, type ActivityType, type Contact, type Stage, type Status } from "../db/types";
   import { fmtDaysAgo, fmtMoney, fmtWhen, t } from "../i18n/index.svelte";
   import { toDateKey } from "../i18n/format";
@@ -40,6 +43,63 @@
     logActivity(c.id, logType, text);
     logText = "";
     ui.nextStepFor = c.id;
+    if (aiReady()) void suggestNextStep(`${logType}: ${text}`);
+  }
+
+  // ── Apple Intelligence ──────────────────────────────────────────────
+  /** Contact summary card (not stored; gone when another contact is opened). */
+  let summary = $state<(AiMeta & { summary: string; next_step: string }) | null>(null);
+  let summarizing = $state(false);
+  let summaryError = $state("");
+
+  async function summarize() {
+    summarizing = true;
+    summaryError = "";
+    try {
+      summary = await aiCall("summarize", { context: contactContext(c, data.activities, data.reminders) });
+    } catch (err) {
+      summaryError = aiErrorText(err);
+    } finally {
+      summarizing = false;
+    }
+  }
+
+  function addSummaryToNotes() {
+    if (!summary) return;
+    const block = `✨ ${fmtDate(Date.now())}: ${summary.summary}`;
+    updateContact(c.id, { notes: c.notes.trim() ? `${c.notes.trim()}\n\n${block}` : block });
+    summary = null;
+  }
+
+  /** AI follow-up suggestion shown in the "Next step?" prompt after logging an activity. */
+  let suggestion = $state<{ title: string; at: number; meta: AiMeta } | null>(null);
+  let suggesting = $state(false);
+  let suggestSeq = 0;
+
+  async function suggestNextStep(activity: string) {
+    const seq = ++suggestSeq;
+    suggestion = null;
+    suggesting = true;
+    try {
+      const out = await aiCall<{ title: string; when: string }>("next_step", {
+        context: contactContext(c, data.activities, data.reminders, 3000),
+        activity,
+        today: todayLabel(new Date()),
+      });
+      if (seq !== suggestSeq || !out.title) return;
+      suggestion = { title: out.title, at: nextStepTime(out.when, data.settings.tomorrow_time, new Date()), meta: out };
+    } catch (err) {
+      console.warn("next-step suggestion failed", err);
+    } finally {
+      if (seq === suggestSeq) suggesting = false;
+    }
+  }
+
+  function acceptSuggestion() {
+    if (!suggestion) return;
+    createReminder({ title: suggestion.title, datetime: suggestion.at, contact_id: c.id });
+    suggestion = null;
+    ui.nextStepFor = null;
   }
 
   export function focusLog() {
@@ -76,7 +136,31 @@
       {/if}
     </div>
     <div class="quickrow"><QuickReminders title={followUp} contactId={c.id} /></div>
+    {#if aiReady()}
+      <div class="row">
+        <button class="btn small" disabled={summarizing} onclick={summarize}>✨ {summarizing ? t("ai.thinking") : t("ai.summary")}</button>
+        {#if summaryError}<span class="red small">{summaryError}</span>{/if}
+      </div>
+    {/if}
   </div>
+
+  {#if summary}
+    <div class="aicard">
+      <div class="row">
+        <strong class="grow">✨ {t("ai.summary")}</strong>
+        <button class="btn small ghost icon" title={t("common.close")} aria-label={t("common.close")} onclick={() => (summary = null)}><Icon name="x" size={11} /></button>
+      </div>
+      <p class="sum">{summary.summary}</p>
+      {#if summary.next_step}
+        <div class="nextai"><span class="muted">{t("contacts.next_step")}</span> {summary.next_step}</div>
+        <QuickReminders small title={summary.next_step} contactId={c.id} />
+      {/if}
+      <div class="row foot">
+        <span class="faint small grow">{aiResultLabel(summary)} · {t("ai.may_be_wrong")}</span>
+        <button class="btn small" onclick={addSummaryToNotes}>{t("ai.add_to_notes")}</button>
+      </div>
+    </div>
+  {/if}
 
   <div class="scroll">
     <dl class="fields">
@@ -154,6 +238,11 @@
         <div class="next">
           <strong>{t("contacts.next_step")}</strong>
           <QuickReminders small title={followUp} contactId={c.id} oncreated={() => (ui.nextStepFor = null)} />
+          {#if suggestion}
+            <button class="btn small aichip" title={aiResultLabel(suggestion.meta)} onclick={acceptSuggestion}>✨ {suggestion.title} · {fmtWhen(suggestion.at, ui.now)}</button>
+          {:else if suggesting}
+            <span class="faint small">✨ {t("ai.thinking")}</span>
+          {/if}
           <span class="grow"></span>
           <button class="btn small ghost" onclick={() => (ui.nextStepFor = null)}>{t("common.dismiss")} <span class="kbd">Esc</span></button>
         </div>
@@ -205,6 +294,12 @@
   .log { display: flex; flex-direction: column; gap: 5px; margin-bottom: 4px; }
   .types { display: flex; gap: 4px; }
   .logtext { width: 100%; height: 28px; }
+  .aicard { margin: 10px 16px 0; padding: 9px 12px; border-radius: 9px; background: var(--accent-soft); display: flex; flex-direction: column; gap: 5px; }
+  .sum { margin: 0; line-height: 1.45; user-select: text; -webkit-user-select: text; }
+  .nextai { font-size: 12px; }
+  .foot { gap: 6px; }
+  .small { font-size: 11px; }
+  .aichip { border-color: var(--accent); color: var(--accent); max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
   .next { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; padding: 7px 10px; border-radius: 8px; background: var(--accent-soft); }
   .act { display: flex; gap: 8px; padding: 5px 0; border-bottom: 0.5px solid var(--border); }
   .act .icon { padding-top: 4px; }

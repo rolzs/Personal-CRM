@@ -9,7 +9,9 @@
 //!   * `backup`    – SQLite file backup/restore and plain file I/O for exports
 //!   * `i18n`      – reads the same locales/*.json the frontend uses
 //!   * `calendar`  – EventKit bridge for two-way Apple Calendar sync
+//!   * `ai`        – Apple Intelligence (Foundation Models) via a Swift bridge
 
+mod ai;
 mod backup;
 mod calendar;
 mod i18n;
@@ -87,6 +89,7 @@ pub fn run() {
             calendar::calendar_upsert,
             calendar::calendar_delete,
             calendar::calendar_open_privacy_settings,
+            ai::ai_call,
         ])
         .on_menu_event(menu::handle_event)
         .on_window_event(|window, event| match event {

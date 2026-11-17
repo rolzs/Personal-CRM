@@ -12,6 +12,8 @@
   import ContactPanel from "./ContactPanel.svelte";
   import EmptyState from "../ui/EmptyState.svelte";
   import Icon from "../ui/Icon.svelte";
+  import PasteContacts from "./PasteContacts.svelte";
+  import { aiReady } from "../ai/ai.svelte";
 
   type SortKey = "name" | "company" | "status" | "last" | "next";
   let query = $state("");
@@ -19,6 +21,7 @@
   let sortKey = $state<SortKey>("name");
   let sortDir = $state<1 | -1>(1);
   let searchInput: HTMLInputElement | undefined = $state();
+  let pasteOpen = $state(false);
 
   const allTags = $derived([...new Set(data.contacts.flatMap((c) => c.tags))].sort((a, b) => a.localeCompare(b)));
 
@@ -124,6 +127,7 @@
         </select>
       </div>
       <span class="grow"></span>
+      {#if aiReady()}<button class="btn" onclick={() => (pasteOpen = true)}>✨ {t("ai.paste_button")}</button>{/if}
       <button class="btn primary" onclick={newContact}><Icon name="plus" size={12} /> {t("contacts.new")} <span class="kbd light">⌘N</span></button>
     </header>
 
@@ -170,6 +174,8 @@
     {#key selected.id}<ContactPanel contact={selected} />{/key}
   {/if}
 </div>
+
+{#if pasteOpen}<PasteContacts onclose={() => (pasteOpen = false)} />{/if}
 
 <style>
   .wrap { display: flex; height: 100%; min-height: 0; }
