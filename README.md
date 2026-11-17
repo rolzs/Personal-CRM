@@ -86,9 +86,61 @@ access; choose **Full Access**.
 - Turning sync off leaves the existing events in the calendar. Deleting the CRM
   calendar in Calendar.app turns sync off.
 - **Ad-hoc signing:** macOS ties the calendar permission to the app's signature,
-  which changes with every rebuild, so a rebuilt app may ask for access again
-  (or appear as denied – re-enable it in System Settings → Privacy & Security →
-  Calendars).
+  which changes with every rebuild, so a rebuilt app asks for access again on
+  its first sync. If it shows as denied instead, re-enable it in System Settings
+  → Privacy & Security → Calendars.
+
+## Apple Intelligence
+
+On an Apple Silicon Mac with Apple Intelligence turned on (macOS 26+), the CRM
+uses Apple's **on-device** language model. Nothing leaves the Mac.
+
+- **Contact summary**: ✨ *Kopsavilkums / Summary* in a contact's panel gives
+  a short "where things stand" plus a suggested next step (with one-click
+  reminder buttons). *Add to notes* saves it; otherwise it is not stored.
+- **Next-step suggestion**: after logging an activity, the *Next step?* prompt
+  also offers an AI reminder ("Send BESS offer to Dmitrijs · next Tuesday");
+  one click creates it. Its timing is read by the app's own quick-add parser.
+- **Paste contacts**: ✨ *Ielīmēt kontaktus / Paste contacts* in the Contacts
+  view. Paste an email signature or any text with people in it, check/edit the
+  rows, create them. Emails and phone numbers that don't literally appear in the
+  pasted text are dropped, so the model can't invent them.
+
+Notes:
+- Latvian is not one of the model's languages, so answers come in English
+  (Settings → Apple Intelligence lists the supported languages). The model
+  still reads Latvian text.
+- It can be wrong – results are labelled and nothing is saved without a click.
+- Settings → Apple Intelligence → *Show AI features* hides everything.
+- Without Apple Intelligence (Intel Mac, turned off, model downloading) the AI
+  buttons simply don't appear.
+
+### Apple's cloud model (prepared, not usable yet)
+
+The switch *Use Apple's cloud model when the local one can't* lets the app use
+Apple's larger Private Cloud Compute model (macOS 27+) when the local model is
+unavailable, the text is too long, or the answer language is unsupported. Data
+then goes to Apple's servers. Apple only allows this for apps with a **managed
+entitlement** it grants, which needs a paid Apple Developer account, a real
+signing identity and a provisioning profile. Without it, switching it on runs
+one test call, which fails, and the switch stays off. To enable it later:
+request access at <https://developer.apple.com/private-cloud-compute/>, add
+the entitlement to `src-tauri/Entitlements.plist`, and set
+`bundle.macOS.signingIdentity` and `bundle.macOS.provisioningProfile` in
+`src-tauri/tauri.conf.json`. Don't add the entitlement before that: an ad-hoc
+signed app with a managed entitlement may not launch.
+
+### How it is built
+
+Apple's model can only be called from Swift. `src-tauri/swift/CRMIntelligence`
+is a small Swift package that `src-tauri/build.rs` compiles for each
+architecture and links into the app; `src-tauri/src/ai.rs` calls it. Only the
+Command Line Tools are needed (no Xcode). The Rust tests that exercise the real
+model are ignored by default:
+
+```bash
+cd src-tauri && cargo test --lib ai:: -- --include-ignored --nocapture
+```
 
 ## Where your data lives
 
@@ -139,6 +191,7 @@ src/
     reminders/            one-click reminder buttons, reminder row, .ics export
     contacts/             table, side panel, tags, freshness colours
     calendar/             month/week views, event popover, Apple Calendar sync (reconcile + runner)
+    ai/                   Apple Intelligence state, calls and input/output helpers
     activities/           activity log
     summary/              home screen
     settings/             settings view + native settings sync
@@ -155,6 +208,8 @@ src-tauri/
     backup.rs             backup, restore, file export helpers
     i18n.rs               reads locales/*.json for native UI text
     calendar.rs           EventKit bridge for the Apple Calendar sync
+    ai.rs                 Apple Intelligence: calls the Swift bridge
+  swift/CRMIntelligence/  Swift package wrapping Apple's Foundation Models
 scripts/                  icon generator, locale checker
 ```
 

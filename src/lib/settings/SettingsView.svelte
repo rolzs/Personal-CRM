@@ -10,6 +10,7 @@
   import { appleCal, disableAppleCalendar, enableAppleCalendar, openCalendarPrivacySettings, refreshCalendarStatus } from "../calendar/appleSync.svelte";
   import { fmtWhen } from "../i18n/index.svelte";
   import { ui } from "../ui/state.svelte";
+  import { ai, checkAi, setCloudEnabled } from "../ai/ai.svelte";
 
   let folder = $state("");
   let dbPath = $state("");
@@ -21,6 +22,8 @@
   });
   invoke<string>("db_path").then((p) => (dbPath = p ?? ""));
   void refreshCalendarStatus();
+  void checkAi();
+  const LANG_NAMES: Record<string, string> = { da: "DA", de: "DE", en: "EN", es: "ES", fr: "FR", it: "IT", ja: "JA", ko: "KO", nb: "NB", nl: "NL", pt: "PT", sv: "SV", tr: "TR", vi: "VI", zh: "ZH" };
 
   let calendarToggling = $state(false);
   async function toggleCalendar(on: boolean) {
@@ -128,6 +131,31 @@
         <button class="btn" onclick={openCalendarPrivacySettings}>{t("apple.open_settings")}</button>
       </div>
     {/if}
+  </section>
+
+  <section class="card">
+    <h2>Apple Intelligence</h2>
+    <div class="line">
+      <div class="grow">
+        <div>{ai.local.available ? t("ai.status_ready") : t(`ai.reason.${ai.local.reason || "unavailable"}`)}</div>
+        {#if ai.local.available}
+          <div class="faint small">{t("ai.languages", { list: ai.local.languages.map((l) => LANG_NAMES[l] ?? l.toUpperCase()).join(", ") })}{ai.local.languages.includes("lv") ? "" : ` · ${t("ai.no_latvian")}`}</div>
+        {/if}
+      </div>
+    </div>
+    <label class="line">
+      <div class="grow"><div>{t("ai.show")}</div><div class="faint small">{t("ai.show_hint")}</div></div>
+      <input type="checkbox" checked={data.settings.ai_enabled} onchange={(e) => setSetting("ai_enabled", e.currentTarget.checked)} />
+    </label>
+    <label class="line">
+      <div class="grow">
+        <div>{t("ai.cloud")}</div>
+        <div class="faint small">{t("ai.cloud_hint")}</div>
+        {#if !ai.cloud.available}<div class="faint small">{t(`ai.reason.${ai.cloud.reason || "unavailable"}`)}</div>{/if}
+      </div>
+      <input type="checkbox" checked={data.settings.ai_cloud} disabled={ai.probing || (!ai.cloud.available && !data.settings.ai_cloud)}
+        onchange={(e) => setCloudEnabled(e.currentTarget.checked)} />
+    </label>
   </section>
 
   <section class="card">

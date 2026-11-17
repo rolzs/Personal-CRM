@@ -236,6 +236,55 @@
     "calendar_missing": "The “CRM” calendar was deleted – sync turned off",
     "sync_failed": "Calendar sync failed: {error}"
   },
+  "ai": {
+    "summary": "Summary",
+    "thinking": "Thinking…",
+    "may_be_wrong": "may be wrong",
+    "label_local": "Apple Intelligence",
+    "label_cloud": "Apple Intelligence (cloud)",
+    "answered_english": "answered in English",
+    "add_to_notes": "Add to notes",
+    "job_title": "Title",
+    "paste_button": "Paste contacts",
+    "paste_title": "Paste contacts",
+    "paste_placeholder": "Paste an email signature or any text with contact people…",
+    "paste_recognise": "Recognise",
+    "paste_none": "No people found in the text.",
+    "paste_create_one": "Create {n} contact",
+    "paste_create_other": "Create {n} contacts",
+    "status_ready": "Apple Intelligence is available on this Mac",
+    "languages": "Languages: {list}",
+    "no_latvian": "Latvian is not supported – answers will be in English",
+    "show": "Show AI features",
+    "show_hint": "Contact summary, next-step suggestion and paste contacts. Runs on this Mac.",
+    "cloud": "Use Apple's cloud model when the local one can't",
+    "cloud_hint": "Data is then sent to Apple's Private Cloud Compute servers. Requires an Apple-granted entitlement and a paid developer account.",
+    "cloud_enabled": "Apple cloud model enabled",
+    "reason": {
+      "device_not_eligible": "This Mac doesn't support Apple Intelligence",
+      "not_enabled": "Apple Intelligence is turned off in System Settings",
+      "model_not_ready": "The Apple Intelligence model is still downloading",
+      "unsupported_os": "Requires a newer macOS",
+      "system_not_ready": "The cloud model isn't ready yet",
+      "quota_reached": "Cloud model limit reached",
+      "unavailable": "Not available"
+    },
+    "err": {
+      "unavailable": "Apple Intelligence is not available",
+      "too_long": "The text is too long for the model",
+      "refused": "The model declined to answer",
+      "model_not_ready": "The model is still downloading – try later",
+      "unsupported_language": "This language isn't supported",
+      "rate_limited": "Too many requests – try again shortly",
+      "bad_output": "The model's answer was unusable – try again",
+      "failed": "Apple Intelligence couldn't answer",
+      "cloud_not_entitled": "The cloud model isn't allowed for this app (needs Apple's entitlement)",
+      "cloud_network": "Can't reach Apple's cloud model",
+      "cloud_quota": "Cloud model limit reached",
+      "cloud_unavailable": "The cloud model isn't available",
+      "cloud_failed": "The cloud model didn't answer"
+    }
+  },
   "shortcuts": {
     "title": "Keyboard shortcuts",
     "group_general": "General",
@@ -278,7 +327,8 @@
     "reminder_reopened": "Reminder reopened",
     "reminder_snoozed": "Reminder snoozed",
     "sample_cleared": "Sample data cleared",
-    "calendar_synced": "Updated from Apple Calendar"
+    "calendar_synced": "Updated from Apple Calendar",
+    "contacts_pasted": "Contacts pasted"
   },
   "toast": {
     "undone": "Undone: {action}",

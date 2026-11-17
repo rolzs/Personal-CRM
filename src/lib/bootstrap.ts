@@ -9,6 +9,7 @@ import { seedSampleData } from "./db/seed";
 import { emit, invoke, listen, requestNotificationPermission, type WindowKind } from "./native";
 import { applyAllSettings } from "./settings/apply";
 import { refreshCalendarStatus, scheduleCalendarSync } from "./calendar/appleSync.svelte";
+import { checkAi } from "./ai/ai.svelte";
 import { createContact } from "./db/store.svelte";
 import { t } from "./i18n/index.svelte";
 import { openContact, ui, type View } from "./ui/state.svelte";
@@ -94,6 +95,7 @@ export async function bootstrap(kind: WindowKind): Promise<void> {
   setSetting("last_run_at", now);
 
   await applyAllSettings();
+  void checkAi();
   syncNative();
   if (!data.settings.notifications_asked) {
     setSetting("notifications_asked", true);

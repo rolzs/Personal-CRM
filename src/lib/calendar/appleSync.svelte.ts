@@ -69,8 +69,18 @@ async function runSync(): Promise<void> {
   }
 }
 
+/** Set when a lost permission was re-requested, so a refusal doesn't loop. */
+let reRequested = false;
+
 async function handleError(message: string): Promise<void> {
-  const status = await refreshCalendarStatus();
+  let status = await refreshCalendarStatus();
+  if (status === "not_determined" && !reRequested) {
+    // A rebuilt (re-signed) app counts as new to macOS: ask again instead of giving up.
+    reRequested = true;
+    await invoke<boolean>("calendar_request_access");
+    status = await refreshCalendarStatus();
+    if (status === "full") { scheduleCalendarSync(0); return; }
+  }
   if (status !== "full") {
     setSetting("calendar_sync", false);
     toast(t("apple.lost_access"), { error: true });
